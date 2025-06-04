@@ -44,7 +44,6 @@ NEXTAUTH_SECRET="your-secret-key-here-change-in-production"
 # Slack OAuth (개발 시 설정 필요)
 SLACK_CLIENT_ID=""
 SLACK_CLIENT_SECRET=""
-SLACK_REDIRECT_URI="http://localhost:3000/api/auth/slack/callback"
 ```
 
 ### 4. 데이터베이스 초기화
