@@ -2,10 +2,10 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 
-export default function SlackSetup() {
+function SlackSetupContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -16,33 +16,7 @@ export default function SlackSetup() {
     text: string;
   } | null>(null);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/auth/signin');
-      return;
-    }
-
-    if (session) {
-      checkSlackIntegration();
-      handleOAuthResult();
-    }
-  }, [session, status, router, searchParams]);
-
-  const checkSlackIntegration = async () => {
-    try {
-      const response = await fetch('/api/user/tokens');
-      if (response.ok) {
-        const data = await response.json();
-        setHasSlackIntegration(data.hasSlackIntegration);
-      }
-    } catch (error) {
-      console.error('Slack 연동 상태 확인 실패:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOAuthResult = () => {
+  const handleOAuthResult = useCallback(() => {
     const success = searchParams.get('success');
     const error = searchParams.get('error');
 
@@ -81,6 +55,32 @@ export default function SlackSetup() {
         type: 'error',
         text: errorMessage,
       });
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (session) {
+      checkSlackIntegration();
+      handleOAuthResult();
+    }
+  }, [session, status, router, searchParams, handleOAuthResult]);
+
+  const checkSlackIntegration = async () => {
+    try {
+      const response = await fetch('/api/user/tokens');
+      if (response.ok) {
+        const data = await response.json();
+        setHasSlackIntegration(data.hasSlackIntegration);
+      }
+    } catch (error) {
+      console.error('Slack 연동 상태 확인 실패:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -342,5 +342,24 @@ export default function SlackSetup() {
         </div>
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="text-lg text-gray-600">로딩 중...</div>
+      </div>
+    </div>
+  );
+}
+
+export default function SlackSetup() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <SlackSetupContent />
+    </Suspense>
   );
 }

@@ -135,7 +135,8 @@ export default function SetupComplete() {
                     📚 Notion 관련 질문:
                   </p>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    "지난주 회의록에서 논의된 프로젝트 일정은 어떻게 되나요?"
+                    &quot;지난주 회의록에서 논의된 프로젝트 일정은 어떻게
+                    되나요?&quot;
                   </p>
                 </div>
                 <div className="bg-gradient-to-r from-gray-50/80 to-slate-50/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100">
@@ -143,7 +144,8 @@ export default function SetupComplete() {
                     🐙 GitHub 관련 질문:
                   </p>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    "최근에 작업한 React 컴포넌트의 구현 방법을 알려주세요."
+                    &quot;최근에 작업한 React 컴포넌트의 구현 방법을
+                    알려주세요.&quot;
                   </p>
                 </div>
                 <div className="bg-gradient-to-r from-purple-50/80 to-pink-50/80 backdrop-blur-sm p-4 rounded-xl border border-purple-100">
@@ -151,7 +153,7 @@ export default function SetupComplete() {
                     🔗 통합 질문:
                   </p>
                   <p className="text-gray-600 text-sm leading-relaxed">
-                    "프로젝트 X와 관련된 문서와 코드를 정리해주세요."
+                    &quot;프로젝트 X와 관련된 문서와 코드를 정리해주세요.&quot;
                   </p>
                 </div>
               </div>
