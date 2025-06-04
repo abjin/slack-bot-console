@@ -1,15 +1,20 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
 export default function SlackSetup() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [hasSlackIntegration, setHasSlackIntegration] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -19,8 +24,9 @@ export default function SlackSetup() {
 
     if (session) {
       checkSlackIntegration();
+      handleOAuthResult();
     }
-  }, [session, status, router]);
+  }, [session, status, router, searchParams]);
 
   const checkSlackIntegration = async () => {
     try {
@@ -36,18 +42,77 @@ export default function SlackSetup() {
     }
   };
 
-  const handleSlackConnect = () => {
-    // 실제 Slack OAuth URL을 구성해야 합니다
-    // 지금은 시뮬레이션을 위해 경고 메시지를 표시합니다
-    alert(
-      'Slack OAuth 연동 기능은 실제 Slack 앱 설정이 필요합니다. 개발 단계에서는 시뮬레이션됩니다.'
-    );
+  const handleOAuthResult = () => {
+    const success = searchParams.get('success');
+    const error = searchParams.get('error');
 
-    // 시뮬레이션: 성공한 것처럼 처리
-    setHasSlackIntegration(true);
-    setTimeout(() => {
-      router.push('/setup/complete');
-    }, 1000);
+    if (success) {
+      setMessage({
+        type: 'success',
+        text: 'Slack 연동이 성공적으로 완료되었습니다!',
+      });
+      setHasSlackIntegration(true);
+    } else if (error) {
+      let errorMessage = 'Slack 연동 중 오류가 발생했습니다.';
+
+      switch (error) {
+        case 'access_denied':
+          errorMessage = '사용자가 Slack 연동을 거부했습니다.';
+          break;
+        case 'no_code':
+          errorMessage = '인증 코드가 누락되었습니다.';
+          break;
+        case 'config_missing':
+          errorMessage =
+            'Slack 앱 설정이 누락되었습니다. 관리자에게 문의하세요.';
+          break;
+        case 'oauth_failed':
+          errorMessage = 'Slack OAuth 인증에 실패했습니다.';
+          break;
+        case 'token_missing':
+          errorMessage = '토큰 정보가 누락되었습니다.';
+          break;
+        case 'server_error':
+          errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도하세요.';
+          break;
+      }
+
+      setMessage({
+        type: 'error',
+        text: errorMessage,
+      });
+    }
+  };
+
+  const generateSlackOAuthUrl = () => {
+    const clientId = process.env.NEXT_PUBLIC_SLACK_CLIENT_ID;
+    if (!clientId) {
+      alert(
+        'Slack 클라이언트 ID가 설정되지 않았습니다. 환경 변수를 확인해주세요.'
+      );
+      return null;
+    }
+
+    const redirectUri = `${window.location.origin}/api/slack/callback`;
+    const scopes =
+      'chat:write,chat:write.public,commands,channels:read,groups:read,im:read,mpim:read';
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      scope: scopes,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      state: Math.random().toString(36).substring(7), // CSRF 보호를 위한 상태값
+    });
+
+    return `https://slack.com/oauth/v2/authorize?${params.toString()}`;
+  };
+
+  const handleSlackConnect = () => {
+    const oauthUrl = generateSlackOAuthUrl();
+    if (oauthUrl) {
+      window.location.href = oauthUrl;
+    }
   };
 
   if (status === 'loading' || loading) {
@@ -88,6 +153,24 @@ export default function SlackSetup() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
+          {/* 성공/오류 메시지 */}
+          {message && (
+            <div
+              className={`mb-8 p-6 rounded-2xl shadow-lg border ${
+                message.type === 'success'
+                  ? 'bg-green-50/80 border-green-200/50 text-green-700'
+                  : 'bg-red-50/80 border-red-200/50 text-red-700'
+              }`}
+            >
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl">
+                  {message.type === 'success' ? '✅' : '❌'}
+                </span>
+                <p className="font-medium">{message.text}</p>
+              </div>
+            </div>
+          )}
+
           {hasSlackIntegration ? (
             /* 연동 완료 상태 */
             <div className="bg-white/70 backdrop-blur-sm p-10 rounded-2xl shadow-xl border border-white/20 text-center">
