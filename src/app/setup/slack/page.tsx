@@ -85,13 +85,7 @@ function SlackSetupContent() {
   };
 
   const generateSlackOAuthUrl = () => {
-    const clientId = process.env.NEXT_PUBLIC_SLACK_CLIENT_ID;
-    if (!clientId) {
-      alert(
-        'Slack 클라이언트 ID가 설정되지 않았습니다. 환경 변수를 확인해주세요.'
-      );
-      return null;
-    }
+    const clientId = '8789552939334.8998249471988';
 
     const redirectUri = `${window.location.origin}/api/slack/callback`;
     const scopes =
