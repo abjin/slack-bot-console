@@ -73,17 +73,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const tenantId = team.id;
+    const githubPineconeIndexName = `${tenantId}-github-index`;
+    const notionPineconeIndexName = `${tenantId}-notion-index`;
+
     // 데이터베이스에 토큰 정보 저장
     await prisma.tenants.upsert({
       where: { userId: session.user.id },
       update: {
-        tenantId: team.id,
+        tenantId: tenantId,
         slackBotToken: access_token,
+        githubPineconeIndexName,
+        notionPineconeIndexName,
       },
       create: {
         userId: session.user.id,
-        tenantId: team.id,
+        tenantId: tenantId,
         slackBotToken: access_token,
+        githubPineconeIndexName,
+        notionPineconeIndexName,
       },
     });
 
