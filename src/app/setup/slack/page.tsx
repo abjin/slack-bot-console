@@ -85,7 +85,7 @@ function SlackSetupContent() {
   };
 
   const generateSlackOAuthUrl = () => {
-    return `https://slack.com/oauth/v2/authorize?client_id=8789552939334.8998249471988&scope=app_mentions:read,channels:history,channels:read,chat:write,commands,groups:history&user_scope=`;
+    return `https://slack.com/oauth/v2/authorize?client_id=8789552939334.8801393656771&scope=app_mentions:read,channels:history,channels:read,chat:write,groups:history&user_scope=`;
   };
 
   const handleSlackConnect = () => {
@@ -343,3 +343,4 @@ export default function SlackSetup() {
     </Suspense>
   );
 }
+✅  Production: https://slack-bot-frontend-jqk6wbt45-kim-gi-jins-projects.vercel.app [2s]
