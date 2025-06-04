@@ -74,8 +74,8 @@ export async function GET(request: NextRequest) {
     }
 
     const tenantId = team.id;
-    const githubPineconeIndexName = `${tenantId}-github-index`;
-    const notionPineconeIndexName = `${tenantId}-notion-index`;
+    const githubPineconeIndexName = `${tenantId.toLowerCase()}-github-index`;
+    const notionPineconeIndexName = `${tenantId.toLowerCase()}-notion-index`;
 
     // 데이터베이스에 토큰 정보 저장
     await prisma.tenants.upsert({

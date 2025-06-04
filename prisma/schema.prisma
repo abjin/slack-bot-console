@@ -65,17 +65,17 @@ model VerificationToken {
 
 // Tenant tokens for integrations
 model Tenants {
-  id                       String  @id @default(cuid())
-  userId                   String  @unique
-  notionApiKey             String?
-  notionDatabaseId         String?
-  notionPineconeIndexName  String?
-  githubToken              String?
-  githubPineconeIndexName  String?
-  tenantId                 String?
-  slackBotToken            String?
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  notionApiKey            String?
+  notionDatabaseId        String?
+  notionPineconeIndexName String?
+  githubToken             String?
+  githubPineconeIndexName String?
+  tenantId                String?
+  slackBotToken           String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
