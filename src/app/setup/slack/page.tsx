@@ -85,21 +85,7 @@ function SlackSetupContent() {
   };
 
   const generateSlackOAuthUrl = () => {
-    const clientId = '8789552939334.8998249471988';
-
-    const redirectUri = `${window.location.origin}/api/slack/callback`;
-    const scopes =
-      'chat:write,chat:write.public,commands,channels:read,groups:read,im:read,mpim:read';
-
-    const params = new URLSearchParams({
-      client_id: clientId,
-      scope: scopes,
-      redirect_uri: redirectUri,
-      response_type: 'code',
-      state: Math.random().toString(36).substring(7), // CSRF 보호를 위한 상태값
-    });
-
-    return `https://slack.com/oauth/v2/authorize?${params.toString()}`;
+    return `https://slack.com/oauth/v2/authorize?client_id=8789552939334.8998249471988&scope=app_mentions:read,channels:history,channels:read,chat:write,commands,groups:history&user_scope=`;
   };
 
   const handleSlackConnect = () => {
