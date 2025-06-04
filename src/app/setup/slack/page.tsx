@@ -343,4 +343,3 @@ export default function SlackSetup() {
     </Suspense>
   );
 }
-✅  Production: https://slack-bot-frontend-jqk6wbt45-kim-gi-jins-projects.vercel.app [2s]
