@@ -182,6 +182,13 @@ export default function Home() {
             <span>© 2024 Slack Knowledge Bot. All rights reserved.</span>
             <span>•</span>
             <Link
+              href="/terms"
+              className="hover:text-blue-600 transition-colors underline"
+            >
+              서비스 이용약관
+            </Link>
+            <span>•</span>
+            <Link
               href="/privacy"
               className="hover:text-blue-600 transition-colors underline"
             >
