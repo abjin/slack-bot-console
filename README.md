@@ -41,17 +41,37 @@ DATABASE_URL="file:./dev.db"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-secret-key-here-change-in-production"
 
+# GitHub App Configuration
+GITHUB_APP_ID="your-github-app-id"
+GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\nyour-private-key-here\n-----END RSA PRIVATE KEY-----"
+NEXT_PUBLIC_GITHUB_APP_NAME="your-github-app-name"
+
 # Slack OAuth (개발 시 설정 필요)
 SLACK_CLIENT_ID=""
 SLACK_CLIENT_SECRET=""
 ```
 
-### 4. 데이터베이스 초기화
+### 4. GitHub App 설정 (선택사항)
+GitHub 연동을 사용하려면 GitHub App을 생성해야 합니다:
+
+1. [GitHub Apps](https://github.com/settings/apps/new)에서 새 GitHub App 생성
+2. **App name**: 원하는 이름 입력
+3. **Homepage URL**: `https://your-domain.com`
+4. **Callback URL**: `https://your-domain.com/auth/github/callback`
+5. **Repository permissions**:
+   - Contents: Read
+   - Metadata: Read
+   - Pull requests: Read
+   - Issues: Read
+6. **Private key** 생성 및 다운로드
+7. App ID와 Private Key를 `.env` 파일에 추가
+
+### 5. 데이터베이스 초기화
 ```bash
-npx prisma db push
+npx prisma migrate dev
 ```
 
-### 5. 개발 서버 실행
+### 6. 개발 서버 실행
 ```bash
 npm run dev
 ```
@@ -64,10 +84,10 @@ npm run dev
 - 이메일과 비밀번호로 계정을 생성하세요
 - 기존 계정이 있다면 로그인하세요
 
-### 2. API 토큰 설정
+### 2. 서비스 연동 설정
 - **Notion API 키**: [Notion Developers](https://www.notion.so/my-integrations)에서 Integration 생성
 - **Notion 데이터베이스 ID**: 연동할 데이터베이스의 ID 입력
-- **GitHub 토큰**: [GitHub Settings](https://github.com/settings/personal-access-tokens/new)에서 Personal Access Token 생성
+- **GitHub App 설치**: 안전한 GitHub App 방식으로 리포지토리 연동
 
 ### 3. Slack 연동
 - Slack 워크스페이스와 봇을 연결하세요
@@ -127,7 +147,7 @@ A: `.env` 파일의 `DATABASE_URL`이 올바른지 확인하고 `npx prisma db p
 **Q: Notion API 키가 작동하지 않습니다**
 A: Notion Integration이 올바르게 생성되었고, 연동할 페이지/데이터베이스에 Integration이 추가되었는지 확인하세요.
 
-**Q: GitHub 토큰 권한 오류가 발생합니다**
-A: Personal Access Token에 Repository 권한이 부여되었는지 확인하세요.
+**Q: GitHub App 설치 오류가 발생합니다**
+A: GitHub App이 올바르게 생성되었고, 환경변수가 정확히 설정되었는지 확인하세요. Private Key에는 개행 문자(\n)가 포함되어야 합니다.
 
 더 많은 도움이 필요하시면 이슈를 생성해 주세요.

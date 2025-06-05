@@ -9,7 +9,8 @@ interface Tenants {
   notionApiKey: string;
   notionDatabaseId: string;
   notionPineconeIndexName: string;
-  githubToken: string;
+  githubAppInstalled: boolean;
+  githubAppInstallationId: string;
   githubPineconeIndexName: string;
   hasSlackIntegration: boolean;
 }
@@ -53,7 +54,7 @@ export default function Dashboard() {
     if (!tokens) return 0;
     let progress = 0;
     if (tokens.notionApiKey && tokens.notionDatabaseId) progress += 50;
-    if (tokens.githubToken) progress += 25;
+    if (tokens.githubAppInstalled) progress += 25;
     if (tokens.hasSlackIntegration) progress += 25;
     return progress;
   };
@@ -64,8 +65,8 @@ export default function Dashboard() {
     if (!tokens.notionApiKey || !tokens.notionDatabaseId) {
       return { title: 'Notion 연동 설정', href: '/setup/tokens' };
     }
-    if (!tokens.githubToken) {
-      return { title: 'GitHub 토큰 설정', href: '/setup/tokens' };
+    if (!tokens.githubAppInstalled) {
+      return { title: 'GitHub App 설치', href: '/setup/tokens' };
     }
     if (!tokens.hasSlackIntegration) {
       return { title: 'Slack 연동', href: '/setup/slack' };
@@ -229,24 +230,26 @@ export default function Dashboard() {
               <div className="flex items-center space-x-2">
                 <div
                   className={`w-4 h-4 rounded-full ${
-                    tokens?.githubToken
+                    tokens?.githubAppInstalled
                       ? 'bg-green-500 shadow-lg shadow-green-500/30'
                       : 'bg-red-500 shadow-lg shadow-red-500/30'
                   } animate-pulse`}
                 ></div>
                 <span
                   className={`text-sm font-medium ${
-                    tokens?.githubToken ? 'text-green-600' : 'text-red-600'
+                    tokens?.githubAppInstalled
+                      ? 'text-green-600'
+                      : 'text-red-600'
                   }`}
                 >
-                  {tokens?.githubToken ? '연결됨' : '연결 필요'}
+                  {tokens?.githubAppInstalled ? '연결됨' : '연결 필요'}
                 </span>
               </div>
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed">
-              {tokens?.githubToken
-                ? 'GitHub 토큰이 설정되어 리포지토리의 코드와 이슈에 접근할 수 있습니다.'
-                : 'GitHub 개인 액세스 토큰을 설정하여 리포지토리 데이터에 접근하세요.'}
+              {tokens?.githubAppInstalled
+                ? 'GitHub App이 설치되어 리포지토리의 코드와 이슈에 안전하게 접근할 수 있습니다.'
+                : 'GitHub App을 설치하여 리포지토리 데이터에 안전하게 접근하세요.'}
             </p>
             <Link
               href="/setup/tokens"
