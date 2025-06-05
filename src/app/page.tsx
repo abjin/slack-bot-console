@@ -175,6 +175,20 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* 푸터 */}
+        <footer className="mt-20 pt-8 border-t border-white/20 text-center">
+          <div className="flex flex-wrap justify-center items-center gap-4 text-sm text-gray-500">
+            <span>© 2024 Slack Knowledge Bot. All rights reserved.</span>
+            <span>•</span>
+            <Link
+              href="/privacy"
+              className="hover:text-blue-600 transition-colors underline"
+            >
+              개인정보 처리방침
+            </Link>
+          </div>
+        </footer>
       </div>
     </div>
   );
