@@ -30,7 +30,7 @@ function GitHubCallbackContent() {
         }
 
         // 성공적으로 처리되면 설정 완료 페이지로 이동
-        router.push('/setup/complete?github=success');
+        router.push('/dashboard');
       } catch (error) {
         console.error('GitHub 콜백 처리 오류:', error);
         setError(
