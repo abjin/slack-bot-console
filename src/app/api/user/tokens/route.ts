@@ -19,7 +19,8 @@ export async function GET() {
       notionApiKey: tenant?.notionApiKey || '',
       notionDatabaseId: tenant?.notionDatabaseId || '',
       notionPineconeIndexName: tenant?.notionPineconeIndexName || '',
-      githubToken: tenant?.githubToken || '',
+      githubAppInstalled: tenant?.githubAppInstalled || false,
+      githubAppInstallationId: tenant?.githubAppInstallationId || '',
       githubPineconeIndexName: tenant?.githubPineconeIndexName || '',
       hasSlackIntegration:
         tenant?.tenantId && tenant?.slackBotToken ? true : false,
@@ -45,7 +46,6 @@ export async function POST(request: NextRequest) {
       notionApiKey,
       notionDatabaseId,
       notionPineconeIndexName,
-      githubToken,
       githubPineconeIndexName,
     } = await request.json();
 
@@ -54,7 +54,6 @@ export async function POST(request: NextRequest) {
       !notionApiKey &&
       !notionDatabaseId &&
       !notionPineconeIndexName &&
-      !githubToken &&
       !githubPineconeIndexName
     ) {
       return NextResponse.json(
@@ -69,7 +68,6 @@ export async function POST(request: NextRequest) {
         notionApiKey: notionApiKey || undefined,
         notionDatabaseId: notionDatabaseId || undefined,
         notionPineconeIndexName: notionPineconeIndexName || undefined,
-        githubToken: githubToken || undefined,
         githubPineconeIndexName: githubPineconeIndexName || undefined,
       },
       create: {
@@ -77,7 +75,6 @@ export async function POST(request: NextRequest) {
         notionApiKey: notionApiKey || undefined,
         notionDatabaseId: notionDatabaseId || undefined,
         notionPineconeIndexName: notionPineconeIndexName || undefined,
-        githubToken: githubToken || undefined,
         githubPineconeIndexName: githubPineconeIndexName || undefined,
       },
     });

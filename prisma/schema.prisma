@@ -70,7 +70,10 @@ model Tenants {
   notionApiKey            String?
   notionDatabaseId        String?
   notionPineconeIndexName String?
-  githubToken             String?
+  // GitHub App fields
+  githubAppInstallationId String?
+  githubAccessToken       String?
+  githubAppInstalled      Boolean? @default(false)
   githubPineconeIndexName String?
   tenantId                String?
   slackBotToken           String?
