@@ -1,4 +1,4 @@
-# Slack Knowledge Bot Frontend
+# Slack Knowledge Bot Console
 
 Notion과 GitHub 데이터를 기반으로 한 개인화된 RAG 검색을 Slack을 통해 사용할 수 있는 서비스의 프론트엔드 애플리케이션입니다.
 
