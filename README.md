@@ -49,6 +49,10 @@ NEXT_PUBLIC_GITHUB_APP_NAME="your-github-app-name"
 # Slack OAuth (개발 시 설정 필요)
 SLACK_CLIENT_ID=""
 SLACK_CLIENT_SECRET=""
+
+# Backend API Configuration (임베딩 서비스 연동용)
+BACKEND_API_URL="http://localhost:3001"
+BACKEND_API_KEY="your-backend-api-key-here"
 ```
 
 ### 4. GitHub App 설정 (선택사항)

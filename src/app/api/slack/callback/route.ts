@@ -4,6 +4,79 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { WebClient } from '@slack/web-api';
 
+// Notion 임베딩 초기화 함수
+async function initNotionEmbedding(tenantId: string) {
+  try {
+    const backendUrl = process.env.BACKEND_API_URL;
+    const apiKey = process.env.BACKEND_API_KEY;
+
+    if (!apiKey) {
+      console.error('BACKEND_API_KEY가 설정되지 않았습니다.');
+      return false;
+    }
+
+    const response = await fetch(`${backendUrl}/notion-embedding/init`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+      },
+      body: JSON.stringify({ tenantId }),
+    });
+
+    if (!response.ok) {
+      console.error(
+        'Notion 임베딩 초기화 실패:',
+        response.status,
+        response.statusText
+      );
+      return false;
+    }
+
+    console.log('Notion 임베딩 초기화 성공');
+    return true;
+  } catch (error) {
+    console.error('Notion 임베딩 초기화 오류:', error);
+    return false;
+  }
+}
+
+async function initGitHubEmbedding(tenantId: string) {
+  try {
+    const backendUrl = process.env.BACKEND_API_URL;
+    const apiKey = process.env.BACKEND_API_KEY;
+
+    if (!apiKey) {
+      console.error('BACKEND_API_KEY가 설정되지 않았습니다.');
+      return false;
+    }
+
+    const response = await fetch(`${backendUrl}/github-embedding/init`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+      },
+      body: JSON.stringify({ tenantId }),
+    });
+
+    if (!response.ok) {
+      console.error(
+        'Notion 임베딩 초기화 실패:',
+        response.status,
+        response.statusText
+      );
+      return false;
+    }
+
+    console.log('Notion 임베딩 초기화 성공');
+    return true;
+  } catch (error) {
+    console.error('Notion 임베딩 초기화 오류:', error);
+    return false;
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -88,6 +161,11 @@ export async function GET(request: NextRequest) {
         slackBotToken: access_token,
       },
     });
+
+    await Promise.all([
+      initNotionEmbedding(tenantId),
+      initGitHubEmbedding(tenantId),
+    ]);
 
     console.log(`Slack 연동 성공: 팀 ${team.name} (${team.id})`);
 
