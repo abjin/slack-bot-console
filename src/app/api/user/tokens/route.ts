@@ -15,13 +15,23 @@ export async function GET() {
       where: { userId: session.user.id },
     });
 
+    const hasNotionIntegration = !!(
+      tenant?.notionApiKey && tenant?.notionDatabaseId
+    );
+    const hasGitHubIntegration = !!(
+      tenant?.githubAppInstalled && tenant?.githubAppInstallationId
+    );
+    const hasSlackIntegration = !!(tenant?.tenantId && tenant?.slackBotToken);
+
     return NextResponse.json({
       notionApiKey: tenant?.notionApiKey || '',
       notionDatabaseId: tenant?.notionDatabaseId || '',
-      githubAppInstalled: tenant?.githubAppInstalled || false,
+      githubAppInstalled: hasGitHubIntegration,
       githubAppInstallationId: tenant?.githubAppInstallationId || '',
-      hasSlackIntegration:
-        tenant?.tenantId && tenant?.slackBotToken ? true : false,
+      hasSlackIntegration,
+      hasNotionIntegration,
+      hasGitHubIntegration,
+      canConnectSlack: hasNotionIntegration && hasGitHubIntegration,
     });
   } catch (error) {
     console.error('토큰 조회 오류:', error);

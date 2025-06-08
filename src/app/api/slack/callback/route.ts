@@ -85,6 +85,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/auth/signin', request.url));
     }
 
+    // 노션과 깃허브 연동 상태 확인
+    const tenant = await prisma.tenants.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    const hasNotionIntegration = !!(
+      tenant?.notionApiKey && tenant?.notionDatabaseId
+    );
+    const hasGitHubIntegration = !!(
+      tenant?.githubAppInstalled && tenant?.githubAppInstallationId
+    );
+
+    // 노션과 깃허브가 모두 연동되지 않은 경우 슬랙 연동 거부
+    if (!hasNotionIntegration || !hasGitHubIntegration) {
+      console.log('슬랙 연동 거부: 사전 조건 미충족', {
+        hasNotionIntegration,
+        hasGitHubIntegration,
+        userId: session.user.id,
+      });
+      return NextResponse.redirect(
+        new URL('/setup/slack?error=prerequisites_not_met', request.url)
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const code = searchParams.get('code');
     const error = searchParams.get('error');

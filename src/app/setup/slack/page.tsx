@@ -10,9 +10,11 @@ function SlackSetupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [hasSlackIntegration, setHasSlackIntegration] = useState(false);
+  const [hasNotionIntegration, setHasNotionIntegration] = useState(false);
+  const [hasGitHubIntegration, setHasGitHubIntegration] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{
-    type: 'success' | 'error';
+    type: 'success' | 'error' | 'warning';
     text: string;
   } | null>(null);
 
@@ -49,6 +51,10 @@ function SlackSetupContent() {
         case 'server_error':
           errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도하세요.';
           break;
+        case 'prerequisites_not_met':
+          errorMessage =
+            'Slack 연동을 위해서는 먼저 Notion과 GitHub 연동이 완료되어야 합니다.';
+          break;
       }
 
       setMessage({
@@ -76,9 +82,11 @@ function SlackSetupContent() {
       if (response.ok) {
         const data = await response.json();
         setHasSlackIntegration(data.hasSlackIntegration);
+        setHasNotionIntegration(!!(data.notionApiKey && data.notionDatabaseId));
+        setHasGitHubIntegration(data.githubAppInstalled);
       }
     } catch (error) {
-      console.error('Slack 연동 상태 확인 실패:', error);
+      console.error('연동 상태 확인 실패:', error);
     } finally {
       setLoading(false);
     }
@@ -89,6 +97,15 @@ function SlackSetupContent() {
   };
 
   const handleSlackConnect = () => {
+    // 사전 조건 확인
+    if (!hasNotionIntegration || !hasGitHubIntegration) {
+      setMessage({
+        type: 'warning',
+        text: 'Slack 연동을 위해서는 먼저 Notion과 GitHub 연동이 완료되어야 합니다.',
+      });
+      return;
+    }
+
     const oauthUrl = generateSlackOAuthUrl();
     if (oauthUrl) {
       window.location.href = oauthUrl;
@@ -133,18 +150,24 @@ function SlackSetupContent() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
-          {/* 성공/오류 메시지 */}
+          {/* 성공/오류/경고 메시지 */}
           {message && (
             <div
               className={`mb-8 p-6 rounded-2xl shadow-lg border ${
                 message.type === 'success'
                   ? 'bg-green-50/80 border-green-200/50 text-green-700'
+                  : message.type === 'warning'
+                  ? 'bg-yellow-50/80 border-yellow-200/50 text-yellow-700'
                   : 'bg-red-50/80 border-red-200/50 text-red-700'
               }`}
             >
               <div className="flex items-center space-x-3">
                 <span className="text-2xl">
-                  {message.type === 'success' ? '✅' : '❌'}
+                  {message.type === 'success'
+                    ? '✅'
+                    : message.type === 'warning'
+                    ? '⚠️'
+                    : '❌'}
                 </span>
                 <p className="font-medium">{message.text}</p>
               </div>
@@ -183,6 +206,79 @@ function SlackSetupContent() {
           ) : (
             /* 연동 설정 */
             <div className="space-y-8">
+              {/* 사전 조건 상태 */}
+              <div className="bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-white/20">
+                <div className="flex items-center space-x-3 mb-6">
+                  <span className="text-2xl">📋</span>
+                  <h3 className="font-bold text-gray-900 text-lg">
+                    연동 사전 조건 확인
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-lg">📚</span>
+                      <span className="font-medium text-gray-700">
+                        Notion 연동
+                      </span>
+                    </div>
+                    <div
+                      className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+                        hasNotionIntegration
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      <span className="text-sm">
+                        {hasNotionIntegration ? '✅' : '❌'}
+                      </span>
+                      <span className="font-semibold text-sm">
+                        {hasNotionIntegration ? '완료' : '미완료'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-gray-50/50 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-lg">🐙</span>
+                      <span className="font-medium text-gray-700">
+                        GitHub 연동
+                      </span>
+                    </div>
+                    <div
+                      className={`flex items-center space-x-2 px-3 py-1 rounded-full ${
+                        hasGitHubIntegration
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      <span className="text-sm">
+                        {hasGitHubIntegration ? '✅' : '❌'}
+                      </span>
+                      <span className="font-semibold text-sm">
+                        {hasGitHubIntegration ? '완료' : '미완료'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                {(!hasNotionIntegration || !hasGitHubIntegration) && (
+                  <div className="mt-4 p-4 bg-yellow-50/80 border border-yellow-200 rounded-xl">
+                    <p className="text-yellow-700 text-sm flex items-center space-x-2">
+                      <span>⚠️</span>
+                      <span>
+                        Slack 연동을 위해서는 먼저{' '}
+                        <Link
+                          href="/setup/tokens"
+                          className="font-semibold text-yellow-800 underline hover:text-yellow-900"
+                        >
+                          토큰 설정 페이지
+                        </Link>
+                        에서 Notion과 GitHub 연동을 완료해주세요.
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {/* 안내 메시지 */}
               <div className="bg-blue-50/80 backdrop-blur-sm border border-blue-200/50 p-6 rounded-2xl shadow-lg">
                 <div className="flex items-center space-x-3 mb-4">
@@ -274,7 +370,12 @@ function SlackSetupContent() {
                 <div className="mt-10 text-center">
                   <button
                     onClick={handleSlackConnect}
-                    className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-10 py-4 rounded-xl font-bold hover:from-green-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg inline-flex items-center space-x-3"
+                    disabled={!hasNotionIntegration || !hasGitHubIntegration}
+                    className={`px-10 py-4 rounded-xl font-bold transition-all duration-200 shadow-lg inline-flex items-center space-x-3 ${
+                      hasNotionIntegration && hasGitHubIntegration
+                        ? 'bg-gradient-to-r from-green-600 to-blue-600 text-white hover:from-green-700 hover:to-blue-700 transform hover:scale-105'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                   >
                     <svg
                       className="w-6 h-6"
@@ -283,7 +384,11 @@ function SlackSetupContent() {
                     >
                       <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52-2.523A2.528 2.528 0 0 1 5.042 10.12h2.52v2.522a2.528 2.528 0 0 1-2.52 2.523Zm0-6.584a2.528 2.528 0 0 1-2.52-2.523A2.528 2.528 0 0 1 5.042 3.535a2.528 2.528 0 0 1 2.52 2.523v2.523H5.042Zm6.584 0V3.535a2.528 2.528 0 0 1 2.523-2.52 2.528 2.528 0 0 1 2.523 2.52v5.046a2.528 2.528 0 0 1-2.523 2.523 2.528 2.528 0 0 1-2.523-2.523Zm6.584 2.523a2.528 2.528 0 0 1 2.523-2.523 2.528 2.528 0 0 1 2.523 2.523 2.528 2.528 0 0 1-2.523 2.523h-2.523v-2.523Zm0 6.584a2.528 2.528 0 0 1 2.523 2.523 2.528 2.528 0 0 1-2.523 2.523 2.528 2.528 0 0 1-2.523-2.523v-2.523h2.523Zm-6.584 0v2.523a2.528 2.528 0 0 1-2.523 2.523 2.528 2.528 0 0 1-2.523-2.523 2.528 2.528 0 0 1 2.523-2.523h2.523Z" />
                     </svg>
-                    <span>Slack에 연동하기</span>
+                    <span>
+                      {hasNotionIntegration && hasGitHubIntegration
+                        ? 'Slack에 연동하기'
+                        : '사전 조건을 완료해주세요'}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -300,7 +405,7 @@ function SlackSetupContent() {
                   <div className="flex items-start space-x-2">
                     <span className="text-yellow-600">•</span>
                     <p>
-                      Slack 연동을 위해서는 먼저 Notion과 GitHub 토큰 설정이
+                      Slack 연동을 위해서는 먼저 Notion과 GitHub 연동이
                       완료되어야 합니다.
                     </p>
                   </div>
