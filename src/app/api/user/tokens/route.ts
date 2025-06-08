@@ -18,10 +18,8 @@ export async function GET() {
     return NextResponse.json({
       notionApiKey: tenant?.notionApiKey || '',
       notionDatabaseId: tenant?.notionDatabaseId || '',
-      notionPineconeIndexName: tenant?.notionPineconeIndexName || '',
       githubAppInstalled: tenant?.githubAppInstalled || false,
       githubAppInstallationId: tenant?.githubAppInstallationId || '',
-      githubPineconeIndexName: tenant?.githubPineconeIndexName || '',
       hasSlackIntegration:
         tenant?.tenantId && tenant?.slackBotToken ? true : false,
     });
@@ -42,20 +40,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const {
-      notionApiKey,
-      notionDatabaseId,
-      notionPineconeIndexName,
-      githubPineconeIndexName,
-    } = await request.json();
+    const { notionApiKey, notionDatabaseId } = await request.json();
 
     // 입력값 검증
-    if (
-      !notionApiKey &&
-      !notionDatabaseId &&
-      !notionPineconeIndexName &&
-      !githubPineconeIndexName
-    ) {
+    if (!notionApiKey && !notionDatabaseId) {
       return NextResponse.json(
         { error: '최소 하나의 값은 입력해야 합니다.' },
         { status: 400 }
@@ -67,15 +55,11 @@ export async function POST(request: NextRequest) {
       update: {
         notionApiKey: notionApiKey || undefined,
         notionDatabaseId: notionDatabaseId || undefined,
-        notionPineconeIndexName: notionPineconeIndexName || undefined,
-        githubPineconeIndexName: githubPineconeIndexName || undefined,
       },
       create: {
         userId: session.user.id,
         notionApiKey: notionApiKey || undefined,
         notionDatabaseId: notionDatabaseId || undefined,
-        notionPineconeIndexName: notionPineconeIndexName || undefined,
-        githubPineconeIndexName: githubPineconeIndexName || undefined,
       },
     });
 

@@ -69,12 +69,11 @@ model Tenants {
   userId                  String   @unique
   notionApiKey            String?
   notionDatabaseId        String?
-  notionPineconeIndexName String?
   // GitHub App fields
   githubAppInstallationId String?
   githubAccessToken       String?
   githubAppInstalled      Boolean? @default(false)
-  githubPineconeIndexName String?
+
   tenantId                String?
   slackBotToken           String?
   createdAt               DateTime @default(now())

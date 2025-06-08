@@ -8,10 +8,8 @@ import Link from 'next/link';
 interface Tenants {
   notionApiKey: string;
   notionDatabaseId: string;
-  notionPineconeIndexName: string;
   githubAppInstalled: boolean;
   githubAppInstallationId: string;
-  githubPineconeIndexName: string;
   hasSlackIntegration: boolean;
 }
 
